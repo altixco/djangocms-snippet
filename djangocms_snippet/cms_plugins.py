@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys
+import django
+
+from distutils.version import StrictVersion
 
 from django import template
 from django.conf import settings
@@ -31,10 +34,13 @@ class SnippetPlugin(CMSPluginBase):
                 context.update({
                     'html': mark_safe(instance.snippet.html)
                 })
-                content = t.render(Context(context))
             else:
                 t = template.Template(instance.snippet.html)
-                content = t.render(Context(context))
+            django_version = django.get_version()
+            #if StrictVersion(django_version) >= StrictVersion('1.11'):
+            content = t.render(context)
+            #else:
+            #    content = t.render(Context(context))
         except template.TemplateDoesNotExist:
             content = _('Template %(template)s does not exist.') % {
                 'template': instance.snippet.template}
